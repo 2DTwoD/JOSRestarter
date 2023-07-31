@@ -1,11 +1,11 @@
 package org.goznak;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import org.goznak.utils.Dialog;
 import org.goznak.utils.ProcessKiller;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App extends JFrame implements NativeKeyListener
 {
@@ -23,15 +25,18 @@ public class App extends JFrame implements NativeKeyListener
     private int combination = 0;
     public static Dialog dialog;
     public static void main( String[] args ) throws AWTException {
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
         try {
-            GlobalScreen.registerNativeHook();
+            if(!GlobalScreen.isNativeHookRegistered()){
+                GlobalScreen.registerNativeHook();
+            }
         }
         catch (NativeHookException e) {
             App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
             System.exit(1);
         }
-        GlobalScreen.addNativeKeyListener(new App());
-        //new App();
+        GlobalScreen.getInstance().addNativeKeyListener(new App());
     }
     public App() throws AWTException {
         super("JOSRestarter");
@@ -47,17 +52,14 @@ public class App extends JFrame implements NativeKeyListener
         setIconImage(iconImage);
         setResizable(false);
         setAlwaysOnTop(true);
-
         final JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 1));
-
         final List<JButton> buttons = new LinkedList<>();
-
-        buttons.add(getButton("Закрыть winCC", new MouseAdapter(){
+        buttons.add(getButton("Сброс WinCC", new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(dialog.getConfirmDialog("Закрыть WinCC?")) {
-                    ProcessKiller.killProcess("win32calc.exe");
+                if(dialog.getConfirmDialog("Сбросить WinCC?")) {
+                    ProcessKiller.killProcess();
                 }
             }
         }));
@@ -77,12 +79,10 @@ public class App extends JFrame implements NativeKeyListener
                 }
             }
         }));
-
         setContentPane(panel);
         for(JButton button: buttons) {
             panel.add(button);
         }
-
         if(SystemTray.isSupported()){
             setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
@@ -113,10 +113,8 @@ public class App extends JFrame implements NativeKeyListener
                     }
                 }
             });
-
             menu.add(show);
             menu.add(exit);
-
             icon.setPopupMenu(menu);
             tray.add(icon);
         }
@@ -131,12 +129,11 @@ public class App extends JFrame implements NativeKeyListener
         button.setPreferredSize(new Dimension(WIDTH, HEIGHT / 3));
         return button;
     }
-
     public void nativeKeyPressed(NativeKeyEvent e) {
         if(e.getKeyCode() == NativeKeyEvent.VC_1){
             combination |= 1;
         }
-        if(e.getKeyCode() == NativeKeyEvent.VC_CONTROL){
+        if(e.getKeyCode() == NativeKeyEvent.VC_CONTROL_L){
             combination |= 2;
         }
         if(combination >= 3){
@@ -147,8 +144,10 @@ public class App extends JFrame implements NativeKeyListener
         if(e.getKeyCode() == NativeKeyEvent.VC_1){
             combination &= ~1;
         }
-        if(e.getKeyCode() == NativeKeyEvent.VC_CONTROL){
+        if(e.getKeyCode() == NativeKeyEvent.VC_CONTROL_L){
             combination &= ~2;
         }
     }
+    @Override
+    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {}
 }

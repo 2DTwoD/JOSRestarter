@@ -8,7 +8,7 @@ public class Dialog {
         this.parent = parent;
     }
     public boolean getConfirmDialog(String message){
-        return JOptionPane.showConfirmDialog(parent, message) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(parent, message,"Вопрос", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
     public void getInfoDialog(String message){
         JOptionPane.showMessageDialog(parent, message, "Сообщение", JOptionPane.INFORMATION_MESSAGE);

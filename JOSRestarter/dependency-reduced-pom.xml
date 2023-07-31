@@ -11,6 +11,7 @@
         <directory>src/main/res</directory>
         <includes>
           <include>ico.gif</include>
+          <include>Reset_WinCC.vbs</include>
         </includes>
       </resource>
     </resources>
