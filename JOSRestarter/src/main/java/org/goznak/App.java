@@ -1,10 +1,11 @@
-package org.example;
+package org.goznak;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import org.example.utils.ProcessKiller;
+import org.goznak.utils.Dialog;
+import org.goznak.utils.ProcessKiller;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,26 +21,28 @@ public class App extends JFrame implements NativeKeyListener
     private static final int WIDTH = 300;
     private static final int HEIGHT = 300;
     private int combination = 0;
+    public static Dialog dialog;
     public static void main( String[] args ) throws AWTException {
         try {
             GlobalScreen.registerNativeHook();
         }
-        catch (NativeHookException ex) {
-            System.err.println("There was a problem registering the native hook.");
-            System.err.println(ex.getMessage());
+        catch (NativeHookException e) {
+            App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
             System.exit(1);
         }
         GlobalScreen.addNativeKeyListener(new App());
+        //new App();
     }
     public App() throws AWTException {
         super("JOSRestarter");
-        Image iconImage;
+        dialog = new Dialog(this);
+        Image iconImage = null;
         try {
             URL resource = getClass().getResource("/ico.gif");
             iconImage = ImageIO.read(resource);
         } catch (IOException e) {
-            System.out.println("icon not found");
-            return;
+            App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
+            System.exit(1);
         }
         setIconImage(iconImage);
         setResizable(false);
@@ -53,19 +56,25 @@ public class App extends JFrame implements NativeKeyListener
         buttons.add(getButton("Закрыть winCC", new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                ProcessKiller.killProcess("win32calc.exe");
+                if(dialog.getConfirmDialog("Закрыть WinCC?")) {
+                    ProcessKiller.killProcess("win32calc.exe");
+                }
             }
         }));
-        buttons.add(getButton("Перезагрузить Windows", new MouseAdapter(){
+        buttons.add(getButton("Перезагрузить ПК", new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                //ProcessKiller.restartWindows();
+                if(dialog.getConfirmDialog("Перезагрузить ПК?")) {
+                    ProcessKiller.restartWindows();
+                }
             }
         }));
-        buttons.add(getButton("Выключить Windows", new MouseAdapter(){
+        buttons.add(getButton("Выключить ПК", new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                //ProcessKiller.shutDownWindows();
+                if(dialog.getConfirmDialog("Выключить ПК?")) {
+                    ProcessKiller.shutDownWindows();
+                }
             }
         }));
 

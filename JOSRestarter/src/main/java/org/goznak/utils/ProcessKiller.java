@@ -1,15 +1,15 @@
-package org.example.utils;
+package org.goznak.utils;
+
+import org.goznak.App;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ProcessKiller {
-    private static final String TASKLIST = "tasklist";
-    private static final String KILL = "taskkill /IM ";
     public static boolean isProcessRunning(String serviceName) {
         try {
-            Process pro = Runtime.getRuntime().exec(TASKLIST);
+            Process pro = Runtime.getRuntime().exec("tasklist");
             BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -19,20 +19,20 @@ public class ProcessKiller {
             }
 
         } catch (IOException e) {
-            System.out.println("Exception: " +e);
+            App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
         }
         return false;
     }
     public static void killProcess(String serviceName) {
         if(isProcessRunning(serviceName)) {
             try {
-                Runtime.getRuntime().exec(KILL + serviceName);
-                System.out.println(serviceName + " killed successfully!");
+                Runtime.getRuntime().exec("taskkill /IM " + serviceName);
+                App.dialog.getInfoDialog("WinCC закрыт!");
             } catch (IOException e) {
-                System.out.println("Exception: " + e);
+                App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
             }
         } else {
-            System.out.println("Process not working");
+            App.dialog.getInfoDialog("WinCC не запущен");
         }
     }
     public static void shutDownWindows(){
@@ -41,7 +41,7 @@ public class ProcessKiller {
         }
         catch(IOException e)
         {
-            System.out.println("Exception: " +e);
+            App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
         }
     }
     public static void restartWindows(){
@@ -50,7 +50,7 @@ public class ProcessKiller {
         }
         catch(IOException e)
         {
-            System.out.println("Exception: " +e);
+            App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
         }
     }
 }
