@@ -54,9 +54,6 @@ public class App extends JFrame implements NativeKeyListener
             App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
             System.exit(1);
         }
-        setIconImage(iconImage);
-        setResizable(false);
-        setAlwaysOnTop(true);
         final JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 1));
         final List<JButton> buttons = new LinkedList<>();
@@ -95,7 +92,7 @@ public class App extends JFrame implements NativeKeyListener
             TrayIcon icon = new TrayIcon(iconImage);
 
             PopupMenu menu = new PopupMenu();
-            MenuItem show = new MenuItem("Показать");
+            MenuItem show = new MenuItem("Показать (Ctrl+1)");
             show.addActionListener(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -126,6 +123,9 @@ public class App extends JFrame implements NativeKeyListener
 
         setSize(WIDTH, HEIGHT);
         setVisible(false);
+        setIconImage(iconImage);
+        setResizable(false);
+        setAlwaysOnTop(true);
         pack();
     }
     private JButton getButton(String title, MouseListener mouseListener){
@@ -142,6 +142,7 @@ public class App extends JFrame implements NativeKeyListener
             combination |= 2;
         }
         if(combination >= 3){
+            setExtendedState(Frame.NORMAL);
             setVisible(true);
         }
     }
