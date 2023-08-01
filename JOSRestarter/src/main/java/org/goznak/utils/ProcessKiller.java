@@ -23,7 +23,7 @@ public class ProcessKiller {
     }
     public static void restartWindows(){
         try {
-            Runtime.getRuntime().exec("shutdown -r -t 0 -f");
+            Runtime.getRuntime().exec("shutdown -r -t 0");
         }
         catch(IOException e) {
             App.dialog.getErrorDialog("Произошла ошибка: " + e.getMessage());
